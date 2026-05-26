@@ -91,7 +91,7 @@ function SecProblema() {
       <SectionTitle tag="Contexto" label="El problema: sesión revocada sin notificación" />
       <Card accent="#D85A30">
         <p style={{ margin: 0, color: "var(--color-text-secondary)", fontSize: 13.5, lineHeight: 1.8 }}>
-          Metro de Medellín maneja una política de <strong style={{ color: "var(--color-text-primary)" }}>single session</strong>: un usuario solo puede tener una sesión activa. Al iniciar sesión desde un segundo dispositivo, el token anterior es revocado en el backend. El problema: <strong style={{ color: "var(--color-text-primary)" }}>el cliente original no se entera</strong> hasta que falla una petición.
+          El sistema <strong style={{ color: "var(--color-text-primary)" }}>Tu Cívica</strong> maneja una política de <strong style={{ color: "var(--color-text-primary)" }}>single session</strong>: un usuario solo puede tener una sesión activa. Al iniciar sesión desde un segundo dispositivo, el token anterior es revocado en el backend. El problema: <strong style={{ color: "var(--color-text-primary)" }}>el cliente original no se entera</strong> hasta que falla una petición.
         </p>
       </Card>
       <Row>
@@ -138,6 +138,88 @@ function SecProblema() {
   );
 }
 
+const DIAG_THEMES = {
+  event:    { border: "#534ab7", bg: "rgba(83,74,183,0.08)",  color: "#534ab7" },
+  process:  { border: "#185fa5", bg: "rgba(24,95,165,0.08)",  color: "#185fa5" },
+  decision: { border: "#854f0b", bg: "rgba(133,79,11,0.08)",  color: "#854f0b" },
+  web:      { border: "#185fa5", bg: "rgba(24,95,165,0.08)",  color: "#185fa5" },
+  app:      { border: "#0f6e56", bg: "rgba(15,110,86,0.08)",  color: "#0f6e56" },
+  success:  { border: "#0f6e56", bg: "rgba(15,110,86,0.13)",  color: "#0f6e56" },
+  skip:     { border: "transparent", bg: "rgba(0,0,0,0.03)", color: "var(--color-text-tertiary)" },
+};
+
+const DiagNode = ({ type = "event", sub, children }) => {
+  const t = DIAG_THEMES[type];
+  return (
+    <div style={{
+      border: `1.5px solid ${t.border}`, background: t.bg, color: t.color,
+      borderRadius: 6, padding: "5px 10px", fontSize: 11.5, fontWeight: 600,
+      textAlign: "center", width: "100%", boxSizing: "border-box",
+    }}>
+      {children}
+      {sub && <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.85, marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
+};
+
+const DiagArrow = ({ label }) => (
+  <div style={{ textAlign: "center", color: "var(--color-text-tertiary)", margin: "3px 0", fontSize: 13, lineHeight: 1.3 }}>
+    ↓{label && <span style={{ fontSize: 10, display: "block" }}>{label}</span>}
+  </div>
+);
+
+function DecisionDiagram() {
+  return (
+    <div style={{
+      border: "1px solid var(--color-border-tertiary)", borderRadius: 10,
+      padding: "1rem 1rem 0.85rem", background: "var(--color-background-secondary)",
+      marginBottom: "0.85rem",
+    }}>
+      <div style={{
+        fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase",
+        color: "var(--color-text-tertiary)", fontWeight: 600, marginBottom: 12,
+      }}>Diagrama de decisiones · Lambda Dispatcher</div>
+
+      {/* Trunk */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ width: "min(100%, 320px)" }}>
+          <DiagNode type="event" sub="status: REVOKED detectado en DynamoDB">⚡ Evento — DynamoDB Stream</DiagNode>
+          <DiagArrow />
+          <DiagNode type="process" sub="extrae client_type + connectionId / fcm_token">Lambda: session-revocation-dispatcher</DiagNode>
+          <DiagArrow />
+          <DiagNode type="decision">◆&nbsp;&nbsp;¿client_type?</DiagNode>
+        </div>
+      </div>
+
+      {/* Branches */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginTop: 6 }}>
+        <div style={{ borderTop: "2px solid #185fa5", paddingTop: 6 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#185fa5", textAlign: "center", letterSpacing: "0.06em", marginBottom: 4 }}>= "WEB"</div>
+          <DiagNode type="web" sub="¿hay connectionId guardado en la sesión?">¿connectionId?</DiagNode>
+          <DiagArrow label="sí" />
+          <DiagNode type="web" sub="API Gateway Management API">postToConnection(connectionId)</DiagNode>
+          <DiagArrow />
+          <DiagNode type="success" sub="close code 1000">✅ SESSION_REVOKED → WS</DiagNode>
+        </div>
+        <div style={{ borderTop: "2px solid #0f6e56", paddingTop: 6 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#0f6e56", textAlign: "center", letterSpacing: "0.06em", marginBottom: 4 }}>= "APP"</div>
+          <DiagNode type="app" sub="¿hay fcm_token guardado en la sesión?">¿fcm_token?</DiagNode>
+          <DiagArrow label="sí" />
+          <DiagNode type="app" sub="Firebase Admin SDK">firebase.send(fcm_token, data)</DiagNode>
+          <DiagArrow />
+          <DiagNode type="success" sub="silent push — iOS + Android">✅ SESSION_REVOKED → FCM</DiagNode>
+        </div>
+      </div>
+
+      {/* Error paths */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginTop: 6 }}>
+        <DiagNode type="skip">⚠️ no connectionId → log + skip</DiagNode>
+        <DiagNode type="skip">⚠️ no fcm_token → log + skip</DiagNode>
+      </div>
+    </div>
+  );
+}
+
 function SecArquitectura() {
   return (
     <div>
@@ -170,6 +252,7 @@ function SecArquitectura() {
           <div style={{ textAlign: "center", color: "var(--color-text-tertiary)", fontSize: 16, margin: "-4px 0 0" }}>↓</div>
         </div>
       ))}
+      <DecisionDiagram />
       <Row>
         <Card badge="Canal WEB" badgeColor="blue" title="API Gateway WebSocket">
           <p style={{ margin: 0, color: "var(--color-text-secondary)", fontSize: 13, lineHeight: 1.7 }}>

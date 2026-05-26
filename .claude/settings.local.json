@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"require\\('prop-types'\\); console.log\\('ok'\\)\")",
+      "Bash(npm run *)",
+      "Bash(node -e ' *)",
+      "Bash(npx playwright *)",
+      "Bash(ls \"C:\\\\Users\\\\cminota\\\\AppData\\\\Local\\\\ms-playwright\\\\\" 2>/dev/null)",
+      "Read(//c/Users/cminota/AppData/Local/ms-playwright\" 2>/dev/**)"
+    ]
+  }
+}
