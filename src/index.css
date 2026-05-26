@@ -1,0 +1,44 @@
+:root {
+  /* Premium Dark Theme variables for the Metro de Medellín presentation */
+  --color-background-primary: #0b0c10;
+  --color-background-secondary: #14151f;
+  --color-border-tertiary: #222533;
+  --color-border-secondary: #2f3448;
+  --color-text-primary: #f0f2f5;
+  --color-text-secondary: #cbd3e0;
+  --color-text-tertiary: #6e768c;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-background-primary);
+  color: var(--color-text-secondary);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth transitions and scrollbars */
+* {
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-secondary);
+}
