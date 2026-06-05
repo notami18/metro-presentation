@@ -591,7 +591,7 @@ function SecContrato() {
             <li>Endpoint WS: <code style={{ color: "#1D9E75" }}>wss://...?token=JWT</code></li>
             <li>Lambda <code style={{ color: "#1D9E75" }}>$connect</code> valida JWT</li>
             <li>Evento <code style={{ color: "#1D9E75" }}>SESSION_REVOKED</code> por WS (WEB)</li>
-            <li>FCM data message silencioso (APP)</li>
+            <li>FCM data message silencioso (MOBILE)</li>
             <li>Acepta <code style={{ color: "#1D9E75" }}>fcm_token</code> en el login</li>
             <li>PATCH <code style={{ color: "#1D9E75" }}>/v1/session/fcm-token</code>: permite a MOBILE actualizar el <code style={{ color: "#1D9E75" }}>fcm_token</code> sin re-login (requiere JWT válido, retorna 204)</li>
             <li>Close code <code style={{ color: "#1D9E75" }}>1000</code> tras el evento WS</li>
@@ -600,8 +600,8 @@ function SecContrato() {
         <Card badge="Clientes consumen" badgeColor="teal">
           <ul style={{ margin: 0, paddingLeft: 16, color: "var(--color-text-secondary)", fontSize: 13, lineHeight: 2.1 }}>
             <li><strong style={{ color: "var(--color-text-primary)" }}>WEB:</strong> abrir WS al login, hook + screen</li>
-            <li><strong style={{ color: "var(--color-text-primary)" }}>APP:</strong> enviar <code style={{ color: "#1D9E75" }}>fcm_token</code> en el login</li>
-            <li><strong style={{ color: "var(--color-text-primary)" }}>APP:</strong> implementar FCM service</li>
+            <li><strong style={{ color: "var(--color-text-primary)" }}>MOBILE:</strong> enviar <code style={{ color: "#1D9E75" }}>fcm_token</code> en el login</li>
+            <li><strong style={{ color: "var(--color-text-primary)" }}>MOBILE:</strong> implementar FCM service</li>
             <li><strong style={{ color: "var(--color-text-primary)" }}>Ambos:</strong> limpiar store al recibir evento</li>
             <li><strong style={{ color: "var(--color-text-primary)" }}>Ambos:</strong> mostrar <code style={{ color: "#1D9E75" }}>SessionRevokedScreen</code></li>
             <li><strong style={{ color: "var(--color-text-primary)" }}>WEB:</strong> reconexión con backoff</li>
