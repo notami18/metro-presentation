@@ -1,5 +1,7 @@
 import { useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { UserX as UserXIcon } from "lucide-react";
+
 
 const TABS = [
   { id: "problema", label: "El problema" },
@@ -119,7 +121,7 @@ function SecProblema() {
   "document_type_code": "CC",
   "document_number":    "1152693885",
   "password":           "PassWord!",
-  "client_type":        "APP",   // "APP" | "WEB"
+  "client_type":        "MOBILE",   // "MOBILE" | "WEB"
   "device_id":          "uuid-device-A"
 }`}</Code>
         <p style={{ margin: "0.4rem 0 0", fontSize: 12, color: "var(--color-text-tertiary)" }}>
@@ -202,7 +204,7 @@ function DecisionDiagram() {
           <DiagNode type="success" sub="close code 1000">✅ SESSION_REVOKED → WS</DiagNode>
         </div>
         <div style={{ borderTop: "2px solid #0f6e56", paddingTop: 6 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#0f6e56", textAlign: "center", letterSpacing: "0.06em", marginBottom: 4 }}>= "APP"</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#0f6e56", textAlign: "center", letterSpacing: "0.06em", marginBottom: 4 }}>= "MOBILE"</div>
           <DiagNode type="app" sub="¿hay fcm_token guardado en la sesión?">¿fcm_token?</DiagNode>
           <DiagArrow label="sí" />
           <DiagNode type="app" sub="Firebase Admin SDK">firebase.send(fcm_token, data)</DiagNode>
@@ -242,7 +244,7 @@ function SecArquitectura() {
         },
         {
           badge: "Capa 2", color: "blue", title: "Lambda: session-revocation-dispatcher",
-          sub: "Lee el evento del Stream, identifica el client_type (APP / WEB) y enruta al canal correcto."
+          sub: "Lee el evento del Stream, identifica el client_type (MOBILE / WEB) y enruta al canal correcto."
         },
       ].map((item, i) => (
         <div key={i}>
@@ -439,12 +441,12 @@ function SecApp() {
         </p>
       </Card>
       <Card badge="Paso 1 — ambas plataformas" badgeColor="blue" title="Agregar fcm_token al login">
-        <Code>{`// Payload de login actualizado para APP
+        <Code>{`// Payload de login actualizado para MOBILE
 {
   "document_type_code": "CC",
   "document_number":    "1152693885",
   "password":           "PassWord!",
-  "client_type":        "APP",
+  "client_type":        "MOBILE",
   "device_id":          "uuid-device-A",
   "fcm_token":          "dGhpcyBpcyBhIHNhbXBsZQ..."   // ← NUEVO
 
@@ -591,6 +593,7 @@ function SecContrato() {
             <li>Evento <code style={{ color: "#1D9E75" }}>SESSION_REVOKED</code> por WS (WEB)</li>
             <li>FCM data message silencioso (APP)</li>
             <li>Acepta <code style={{ color: "#1D9E75" }}>fcm_token</code> en el login</li>
+            <li>PATCH <code style={{ color: "#1D9E75" }}>/v1/session/fcm-token</code>: permite a MOBILE actualizar el <code style={{ color: "#1D9E75" }}>fcm_token</code> sin re-login (requiere JWT válido, retorna 204)</li>
             <li>Close code <code style={{ color: "#1D9E75" }}>1000</code> tras el evento WS</li>
           </ul>
         </Card>
@@ -642,7 +645,8 @@ function SecContrato() {
               ["FCM integration (envío)", "✅", "—", "—", "—"],
               ["Agregar fcm_token al login", "—", "—", "✅", "✅"],
               ["FirebaseMessagingService", "—", "—", "✅", "✅"],
-              ["onNewToken → actualizar backend", "—", "—", "✅", "✅"],
+              ["PATCH /v1/session/fcm-token", "✅", "—", "—", "—"],
+              ["onNewToken → PATCH /v1/session/fcm-token", "—", "—", "✅", "✅"],
               ["Hook useSessionGuard", "—", "✅", "—", "—"],
               ["SessionRevokedScreen", "—", "✅", "✅", "✅"],
               ["Reconexión WS backoff", "—", "✅", "—", "—"],
